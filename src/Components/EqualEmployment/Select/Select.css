@@ -1,0 +1,28 @@
+select {
+  border: 1px solid var(--lighter-gray);
+  border-radius: 3px;
+  height: 40px;
+  width: 100%;
+  padding: 4px 4px 4px 15px;
+}
+
+select:focus {
+  border-color: var(--dark-gray);
+  outline: none;
+}
+
+/* remove the original arrow */
+select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  -o-appearance: none;
+}
+
+select + i.fa-chevron-down {
+  color: var(--light-gray);
+  position: relative;
+  float: right;
+  margin-top: -30px;
+  margin-right: 15px;
+  pointer-events: none;
+}
