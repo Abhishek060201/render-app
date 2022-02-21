@@ -16,6 +16,13 @@ select {
   -webkit-appearance: none;
   -moz-appearance: none;
   -o-appearance: none;
+  background-color: rgb(233, 233, 233);
+  border: none;
+}
+
+select:focus {
+  background-color: rgb(189, 189, 189);
+
 }
 
 select + i.fa-chevron-down {

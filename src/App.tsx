@@ -17,8 +17,17 @@ const App: React.FC = (): JSX.Element => {
           <div>FULL-TIME</div>
         </div>
       </section>
-
       <Form />
+
+      <footer className='d-flex flex-column align-items-center'>
+        <div className='pt-5'>
+          <a className='homepage-link'>Render Home Page</a>
+        </div>
+        <div className='pt-5'>
+          Jobs Powered by&nbsp;&nbsp;&nbsp;
+          <img src='/images/lever-logo.svg' height='24'/>
+        </div>
+      </footer>
     </div>
   );
 }

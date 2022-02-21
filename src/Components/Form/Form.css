@@ -23,3 +23,23 @@ textarea:focus {
   border-color: var(--dark-gray);
   outline: none;
 }
+
+@media only screen and (min-width: 820px) {
+  .form-container {
+    padding-left: 100px;
+    padding-right: 100px;
+  }
+}
+
+@media only screen and (min-width: 1024px) {
+  .form-container {
+    padding-left: 150px;
+    padding-right: 150px;
+  }
+}
+@media only screen and (min-width: 1120px) {
+  .form-container {
+    padding-left: 200px;
+    padding-right: 200px;
+  }
+}
