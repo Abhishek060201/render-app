@@ -23,6 +23,7 @@ const Form: React.FC = (): JSX.Element => {
               </button>
             </div>
           </div>
+
           <Input
             isRequired={true}
             label='Full name'

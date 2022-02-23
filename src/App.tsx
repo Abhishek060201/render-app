@@ -5,6 +5,7 @@ import './App.css';
 const App: React.FC = (): JSX.Element => {
   return (
     <div className="app">
+      
       <header>
         <a href='www.render.com/jobs'>
           <img
@@ -37,6 +38,7 @@ const App: React.FC = (): JSX.Element => {
           </a>
         </div>
       </footer>
+
     </div>
   );
 }
