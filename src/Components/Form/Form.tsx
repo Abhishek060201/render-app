@@ -14,10 +14,6 @@ const schema = yup.object().shape({
   email: yup.string().email().required(),
   phone: yup.string().matches(phoneRegExp, 'Phone number is not valid'),
   linkedinURL: yup.string().matches(/((https?):\/\/)?(www.)?[a-z0-9]+(\.[a-z]{2,}){1,3}(#?\/?[a-zA-Z0-9#]+)*\/?(\?[a-zA-Z0-9-_]+=[a-zA-Z0-9-%]+&?)?$/, 'Enter correct url!').required('Please enter website'),
-  twitterURL: yup.string().matches(/((https?):\/\/)?(www.)?[a-z0-9]+(\.[a-z]{2,}){1,3}(#?\/?[a-zA-Z0-9#]+)*\/?(\?[a-zA-Z0-9-_]+=[a-zA-Z0-9-%]+&?)?$/, 'Enter correct url!').required('Please enter website'),
-  githubURL: yup.string().matches(/((https?):\/\/)?(www.)?[a-z0-9]+(\.[a-z]{2,}){1,3}(#?\/?[a-zA-Z0-9#]+)*\/?(\?[a-zA-Z0-9-_]+=[a-zA-Z0-9-%]+&?)?$/, 'Enter correct url!').required('Please enter website'),
-  portfolioURL: yup.string().matches(/((https?):\/\/)?(www.)?[a-z0-9]+(\.[a-z]{2,}){1,3}(#?\/?[a-zA-Z0-9#]+)*\/?(\?[a-zA-Z0-9-_]+=[a-zA-Z0-9-%]+&?)?$/, 'Enter correct url!').required('Please enter website'),
-  otherWebsite: yup.string().matches(/((https?):\/\/)?(www.)?[a-z0-9]+(\.[a-z]{2,}){1,3}(#?\/?[a-zA-Z0-9#]+)*\/?(\?[a-zA-Z0-9-_]+=[a-zA-Z0-9-%]+&?)?$/, 'Enter correct url!').required('Please enter website'),
 })
 
 const Form: React.FC = (): JSX.Element => {
@@ -27,6 +23,13 @@ const Form: React.FC = (): JSX.Element => {
 
   const submitForm = (data: object) => {
     console.log(data);
+  }
+
+  const selectFile = (e: React.MouseEvent) => {
+    const fileInput = document.getElementById('attach-file');
+    if(fileInput) 
+      fileInput.click();
+    console.log(e.target);
   }
 
   return (
@@ -39,8 +42,13 @@ const Form: React.FC = (): JSX.Element => {
           <div className="row d-flex align-items-center">
             <label className='resume-label col-md-3'>Resume/CV</label>
             <div className='col-md-9 my-4 my-md-3'>
-              <button
+              <input 
+                id='attach-file' 
+                type='file' 
+              />
+              <button 
                 className='attach-button'
+                onClick={selectFile}
               >
                 <i className="fa-solid fa-paperclip"></i>
                 ATTACH RESUME/CV
@@ -48,31 +56,34 @@ const Form: React.FC = (): JSX.Element => {
             </div>
           </div>
 
-          <p>{errors.fullName?.message}</p>
           <Input
             ref={register}
             label='Full name'
             name='fullName'
             isReq={true}
           />
+          <p className='error'>{errors.fullName?.message}</p>
           <Input
             ref={register}
             label='Email'
             name='email'
             isReq={true}
           />
+          <p className='error'>{errors.email?.message}</p>
           <Input
             ref={register}
             label='Phone'
             name='phone'
             isReq={false}
           />
+          <p className='error'>{errors.phone?.message}</p>
           <Input
             ref={register}
             label='Company'
             name='company'
             isReq={false}
           />
+          <p className='error'>{errors.company?.message}</p>
         </div>
 
         <h4>LINKS</h4>
@@ -132,12 +143,11 @@ const Form: React.FC = (): JSX.Element => {
         </div>
 
         <div className='d-flex'>
-          <button
+          <input
             type='submit'
-            className='submit-button mx-auto'
-          >
-            SUBMIT APPLICATION
-          </button>
+            className='submit-button mx-auto text-center'
+            value='SUBMIT APPLICATION'
+          />
         </div>
 
       </form>
