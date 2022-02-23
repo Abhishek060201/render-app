@@ -12,3 +12,15 @@
 .submit-button:hover {
   background-color: #4456cf;
 }
+
+.race-info {
+  display: block;
+}
+
+.race-info > h6 {
+  font-size: 16px;
+}
+
+.race-info > p {
+  font-size: small;
+}

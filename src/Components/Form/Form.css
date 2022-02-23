@@ -7,9 +7,36 @@ h4 {
   font-size: 16px;
   font-weight: 600;
   letter-spacing: 1px;
-  margin-bottom: 25px;
   line-height: 2;
 }
+
+.resume-label::after {
+  content: ' *';
+  color: red;
+}
+
+.attach-button {
+  border-radius: 3px;
+  border: 1px solid rgb(220, 220, 220);
+  letter-spacing: 2px;
+  color: rgb(138, 138, 138);
+  background-color: rgb(242, 242, 242);
+  padding: 5px 15px;
+}
+
+.attach-button i {
+  color: rgb(138, 138, 138);
+}
+
+.attach-button:focus, .attach-button:hover {
+  background-color: rgb(233, 233, 233);
+  color: rgb(68, 68, 68);
+}
+
+.attach-button:focus i, .attach-button:hover i {
+  color: rgb(68, 68, 68);
+}
+
 
 textarea {
   border: 1px solid var(--lighter-gray);
@@ -22,6 +49,10 @@ textarea {
 textarea:focus {
   border-color: var(--dark-gray);
   outline: none;
+}
+
+.recaptcha-wrapper div {
+  margin: 0 auto;
 }
 
 @media only screen and (min-width: 820px) {
@@ -37,9 +68,17 @@ textarea:focus {
     padding-right: 150px;
   }
 }
+
 @media only screen and (min-width: 1120px) {
   .form-container {
     padding-left: 200px;
     padding-right: 200px;
+  }
+}
+
+@media only screen and (min-width: 1200px) {
+  .form-container {
+    padding-left: 300px;
+    padding-right: 300px;
   }
 }

@@ -33,3 +33,16 @@ select + i.fa-chevron-down {
   margin-right: 15px;
   pointer-events: none;
 }
+
+.fa-info-circle {
+  color: white;
+  background-color: var(--light-gray);
+  border-radius: 50%;
+  border: 1px gray solid;
+  cursor: pointer;
+}
+
+.fa-info-circle:hover {
+  background-color: var(--dark-gray);
+  border-color: var(--dark-gray);
+}

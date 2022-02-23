@@ -3,9 +3,17 @@ import Select from '../Select/Select';
 import './EqualEmployment.css';
 
 const EqualEmployment = () => {
+  const toggleRaceInfo = () => {
+    const raceInfo = document.querySelector<HTMLElement>('.race-info');
+    if (raceInfo) {
+      if (raceInfo.style.display === 'none') raceInfo.style.display = 'block';
+      else raceInfo.style.display = 'none';
+    }
+  }
+
   return (
     <div>
-      <h4>
+      <h4 className='mb-5'>
         U.S. EQUAL EMPLOYMENT OPPORTUNITY INFORMATION &nbsp;&nbsp;
         <span className='fw-normal' style={{ letterSpacing: 'normal' }}>(Completion is voluntary and will not subject you to adverse treatment)</span>
       </h4>
@@ -40,6 +48,17 @@ const EqualEmployment = () => {
         ]}
       />
       <Select
+        info={
+          <i
+            className="fa fa-info-circle"
+            aria-hidden="true"
+            data-bs-toggle="tooltip"
+            data-bs-placement="top"
+            title="Click to see details about each option."
+            onClick={toggleRaceInfo}
+          >
+          </i>
+        }
         label='Race'
         options={[
           {
@@ -83,12 +102,44 @@ const EqualEmployment = () => {
             option: 'Two or More Races (Not Hispanic or Latino)'
           },
           {
-            key: 8,
+            key: 9,
             value: 'decline',
             option: 'Decline to self-identity'
           }
         ]}
       />
+      <div className='row d-flex justify-content-end'>
+        <div className='race-info col-md-9'>
+          <h6>Hispanic or Latino</h6>
+          <p>
+            A person of Cuban, Mexican, Puerto Rican, South or Central American, or other Spanish culture or origin regardless of race.
+          </p>
+          <h6>White (Not Hispanic or Latino)</h6>
+          <p>
+            A person having origins in any of the original peoples of Europe, the Middle East, or North Africa.
+          </p>
+          <h6>Black or African American (Not Hispanic or Latino)</h6>
+          <p>
+            A person having origins in any of the black racial groups of Africa.
+          </p>
+          <h6>Native Hawaiian or Other Pacific Islander (Not Hispanic or Latino)</h6>
+          <p>
+            A person having origins in any of the peoples of Hawaii, Guam, Samoa, or other Pacific Islands.
+          </p>
+          <h6>Asian (Not Hispanic or Latino)</h6>
+          <p>
+            A person having origins in any of the original peoples of the Far East, Southeast Asia, or the Indian Subcontinent, including, for example, Cambodia, China, India, Japan, Korea, Malaysia, Pakistan, the Philippine Islands, Thailand, and Vietnam.
+          </p>
+          <h6>American Indian or Alaska Native (Not Hispanic or Latino)</h6>
+          <p>
+            A person having origins in any of the original peoples of North and South America (including Central America), and who maintain tribal affiliation or community attachment.
+          </p>
+          <h6>Two or More Races (Not Hispanic or Latino)</h6>
+          <p>
+            All persons who identify with more than one of the above five races.
+          </p>
+        </div>
+      </div>
       <Select
         label='Veteran status'
         options={[
@@ -115,9 +166,6 @@ const EqualEmployment = () => {
         ]}
       />
 
-      <div className='d-flex'>
-        <button className='submit-button mx-auto'>SUBMIT APPLICATION</button>
-      </div>
     </div>
   );
 }
