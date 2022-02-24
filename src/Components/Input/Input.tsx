@@ -1,11 +1,12 @@
-import React from 'react'
+import React from 'react';
+import { FieldValues, UseFormRegister } from 'react-hook-form';
 import './Input.css';
 
 type Props = {
   label: string;
   name: string;
-  isReq: boolean;
-  ref?: any
+  isReq: boolean; 
+  register: UseFormRegister<FieldValues>;
 }
 
 const Input = (props: Props): JSX.Element => {
@@ -18,7 +19,10 @@ const Input = (props: Props): JSX.Element => {
         }
       </label>
       <div className='col-md-9 my-4 my-md-3'>
-        <input type='text' name={props.name} />
+        <input 
+          type='text'
+          {...props.register(props.name)}
+        />
       </div>
     </div>
   );
