@@ -7,28 +7,47 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import './Form.css';
 
-const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/
+const phoneRegExp = /^(\+[\d]{1,4})[1-9]\d{3,13}$/;
+const linkedinURLRegExp = /^(https?:\/\/(www.)?linkedin.com\/(mwlite\/ | m\/)?in\/[a-zA-Z0-9_.-]+\/?)/;
+const twitterURLRegExp = /^(https?:\/\/(www.)?twitter.com\/[a-zA-Z0-9_.-]+\/?)/;
+const githubURLRegExp = /^(https?:\/\/(www.)?github.com\/[a-zA-Z0-9_.-]+\/?)/;
+
 
 const schema = yup.object().shape({
+  // resume: yup.mixed()
+  //   .required('Please attach your Resume')
+  //   .test('fileSize', 'The file is too large', (vaue) => {
+  //     return value && value[0].size <= 2000000
+  //   }),
   fullName: yup.string()
     .required('Please Fill in this Field')
     .min(10),
   email: yup.string()
-    .required()
+    .required('Please Fill in this Field')
     .email(),
   phone: yup.string()
-    .matches(phoneRegExp, 'Phone number is not valid'),
+    .required('Please Fill in this Field')
+    .matches(phoneRegExp, 'Phone number is not valid').transform(v => v === '' ? void 0 : v),
   linkedinURL: yup.string()
-    .matches(/((https?):\/\/)?(www.)?[a-z0-9]+(\.[a-z]{2,}){1,3}(#?\/?[a-zA-Z0-9#]+)*\/?(\?[a-zA-Z0-9-_]+=[a-zA-Z0-9-%]+&?)?$/, 'Enter correct url!'),
+    .required('Please Fill in this Field')
+    .matches(linkedinURLRegExp, 'Enter correct url!'),
+  twitterURL: yup.string()
+    .matches(twitterURLRegExp, 'Enter correct url!'),
+  githubURL: yup.string()
+    .matches(githubURLRegExp, 'Enter correct url!'),
 })
 
 const Form: React.FC = (): JSX.Element => {
-  const { register, handleSubmit, formState: { errors } } = useForm({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors }
+  } = useForm({
     resolver: yupResolver(schema)
   });
 
-  const onSubmit = (data: object) => {
-    console.log(data);
+  const submitHandler = (data: object) => {
+    alert(JSON.stringify(data));
   }
 
   const selectFile = (e: React.MouseEvent) => {
@@ -39,17 +58,19 @@ const Form: React.FC = (): JSX.Element => {
 
   return (
     <div className='form-container'>
-      <form className='mx-auto' onSubmit={handleSubmit(onSubmit)}>
-
+      <form className='mx-auto' onSubmit={handleSubmit(submitHandler)}>
+        {console.log(errors)}
         <h4>SUBMIT YOUR APPLICATION</h4>
 
         <div className="row my-4">
+
           <div className="row d-flex align-items-center">
             <label className='resume-label col-md-3'>Resume/CV</label>
             <div className='col-md-9 my-4 my-md-3'>
               <input
                 id='attach-file'
                 type='file'
+                {...register('resume')}
               />
               <button
                 className='attach-button'
@@ -68,6 +89,7 @@ const Form: React.FC = (): JSX.Element => {
             isReq={true}
           />
           <p className='error'>{errors.fullName?.message}</p>
+
           <Input
             label='Email'
             name='email'
@@ -75,13 +97,15 @@ const Form: React.FC = (): JSX.Element => {
             isReq={true}
           />
           <p className='error'>{errors.email?.message}</p>
+
           <Input
             label='Phone'
             name='phone'
             register={register}
-            isReq={false}
+            isReq={true}
           />
           <p className='error'>{errors.phone?.message}</p>
+
           <Input
             label='Company'
             name='company'
@@ -89,28 +113,35 @@ const Form: React.FC = (): JSX.Element => {
             isReq={false}
           />
           <p className='error'>{errors.company?.message}</p>
+
         </div>
 
         <h4>LINKS</h4>
         <div className="row my-4">
           <Input
             label='Linkedin URL'
-            name='linekdinURL'
+            name='linkedinURL'
             register={register}
-            isReq={false}
+            isReq={true}
           />
+          <p className='error'>{errors.linkedinURL?.message}</p>
+
           <Input
             label='Twitter URL'
             name='twitterURL'
             register={register}
             isReq={false}
           />
+          <p className='error'>{errors.twitterURL?.message}</p>
+
           <Input
             label='GitHub URL'
             name='githubURL'
             register={register}
             isReq={false}
           />
+          <p className='error'>{errors.githubURL?.message}</p>
+
           <Input
             label='Portfolio URL'
             name='portfolioURL'
