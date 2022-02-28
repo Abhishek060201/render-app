@@ -252,7 +252,7 @@ const Form: React.FC = (): JSX.Element => {
         <div className='recaptcha-wrapper'>
           <ReCAPTCHA
             className="my-4"
-            sitekey="6LcMq5QeAAAAAMnnojI5eJvtIzoTz_rm5noVnuJm"
+            sitekey="6LfiT6ceAAAAAB1Ra5Pe6CNXe5kzNtwr8rhSGc4m"
             onChange={toggleCaptcha}
           />
           <div className='error mb-4 text-center'>{captchaError}</div>
