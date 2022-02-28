@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { db, storage } from '../../firebase';
 import { collection, addDoc } from "firebase/firestore";
 import { deleteObject, getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
+import { UUID } from 'uuid-generator-ts';
 import EqualEmployment from '../EqualEmployment/EqualEmployment';
 import Input from '../Input/Input';
 import ReCAPTCHA from "react-google-recaptcha";
@@ -9,12 +10,11 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import './Form.css';
-import { UUID } from 'uuid-generator-ts';
 
 const phoneRegExp = /^(\+[\d]{1,4})[1-9]\d{3,13}$/;
-const linkedinURLRegExp = /^(https?:\/\/(www.)?linkedin.com\/(mwlite\/ | m\/)?in\/[a-zA-Z0-9_.-]+\/?)*/;
-const twitterURLRegExp = /^(https?:\/\/(www.)?twitter.com\/[a-zA-Z0-9_.-]+\/?)*/;
-const githubURLRegExp = /^(https?:\/\/(www.)?github.com\/[a-zA-Z0-9_.-]+\/?)*/;
+const linkedinURLRegExp = /^(|(http(s)?:\/\/)?(www.)?linkedin\.com\/(in)\/[\w]+)$/;
+const twitterURLRegExp = /^(|(http(s)?:\/\/)?(www.)?twitter\.com\/[\w]+)$/;
+const githubURLRegExp = /^(|(http(s)?:\/\/)?(www.)?github\.com\/[\w]+)$/;
 
 
 
@@ -31,10 +31,10 @@ const schema = yup.object().shape({
     }),
   fullName: yup.string()
     .required('Please Fill in this Field')
-    .min(10),
+    .min(10, 'Must be atleast 10 characters long'),
   email: yup.string()
     .required('Please Fill in this Field')
-    .email(),
+    .email('Please Enter a valid Email'),
   phone: yup.string()
     .matches(phoneRegExp, 'Phone number is not valid').transform(v => v === '' ? void 0 : v),
   linkedinURL: yup.string()
@@ -43,6 +43,12 @@ const schema = yup.object().shape({
     .matches(twitterURLRegExp, 'Enter correct url!'),
   githubURL: yup.string()
     .matches(githubURLRegExp, 'Enter correct url!'),
+  additionalInfo: yup.string()
+    .test('isEmptyOrMin30Chars', 'Should be atleast 30 characters long', (value: string | undefined) => {
+      if(!value || value.length >= 30) 
+        return true
+      return false
+    })
 })
 
 const Form: React.FC = (): JSX.Element => {
@@ -60,47 +66,44 @@ const Form: React.FC = (): JSX.Element => {
     resolver: yupResolver(schema)
   });
 
-  useEffect(() => {
-    reset()
-  }, [isSubmitSuccessful])
+  // const uploadOnFirestore = (data: any) => {
+  //   const storageRef = ref(storage, new UUID().getDashFreeUUID())
+  //   const uploadTask = uploadBytesResumable(storageRef, data.resume[0])
 
-  const uploadOnFirestore = (data: any) => {
-    const storageRef = ref(storage, new UUID().getDashFreeUUID())
-    const uploadTask = uploadBytesResumable(storageRef, data.resume[0])
-
-    uploadTask.on('state_changed',
-      (snapshot) => (snapshot.bytesTransferred / snapshot.totalBytes) * 100,
-      (error) => {
-        console.log('something went wrong', error)
-      }, () => {
-        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-          data.resume = downloadURL;
-          addDoc(collection(db, 'candidates'), data)
-            .catch((e) => {
-              alert("error" + e)
-              const deleteRef = ref(storage, downloadURL)
-              deleteObject(deleteRef)
-            })
-        });
-      }
-    )
-  }
+  //   uploadTask.on('state_changed',
+  //     (snapshot) => (snapshot.bytesTransferred / snapshot.totalBytes) * 100,
+  //     (error) => {
+  //       console.log('something went wrong', error)
+  //     }, () => {
+  //       getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+  //         data.resume = downloadURL;
+  //         addDoc(collection(db, 'candidates'), data)
+  //           .catch((e) => {
+  //             alert("error" + e)
+  //             const deleteRef = ref(storage, downloadURL)
+  //             deleteObject(deleteRef)
+  //           })
+  //       });
+  //     }
+  //   )
+  // }
 
   const submitHandler = (data: object) => {
     if (captcha) {
-      setCaptchaError("")
       setCaptcha(false)
       setResumeLabel('ATTACH RESUME/CV')
-      uploadOnFirestore(data)
-      alert(JSON.stringify(data));
+      // uploadOnFirestore(data)
+      reset()
+      alert("thank you")
     } else {
       setCaptchaError("Please verify that you are not a robot")
     }
   }
 
   const selectFile = (e: React.MouseEvent) => {
-    const fileInput = document.getElementById('attach-file');
-    fileInput?.click();
+    const fileInput = document.getElementById('attach-file')
+    console.log(fileInput)
+    fileInput?.click()
   }
 
   const onInputChange = (e: React.FormEvent<HTMLInputElement>) => {
@@ -109,8 +112,13 @@ const Form: React.FC = (): JSX.Element => {
     }
   }
 
-  const toggleCaptcha = () => {
-    setCaptcha(true)
+  const toggleCaptcha = (value: any) => {
+    if(value !== null) {
+      setCaptchaError("")
+      setCaptcha(true)
+    } else {
+      setCaptcha(false)
+    }
   }
 
   return (
@@ -174,6 +182,8 @@ const Form: React.FC = (): JSX.Element => {
           <p className='error'>{errors.company?.message}</p>
 
         </div>
+        
+        {console.log(errors)}
 
         <h4>LINKS</h4>
         <div className="row my-4">
@@ -215,7 +225,7 @@ const Form: React.FC = (): JSX.Element => {
           />
         </div>
 
-        {console.log(register)}
+        {/* {console.log(register)} */}
 
         <h4 className='my-5'>PREFERRED PRONOUNS</h4>
         <div className="row">
@@ -226,7 +236,11 @@ const Form: React.FC = (): JSX.Element => {
         </div>
 
         <h4 className='my-5'>ADDITIONAL INFORMATION</h4>
-        <textarea placeholder='Add a cover letter or anything else you want to share.' />
+        <textarea 
+          placeholder='Add a cover letter or anything else you want to share.' 
+          {...register('additionalInfo')}
+        />
+        <p className='error'>{errors.additionalInfo?.message}</p>
 
         <hr className='my-5'></hr>
 

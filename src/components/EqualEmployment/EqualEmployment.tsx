@@ -21,7 +21,12 @@ const EqualEmployment = (props: Props) => {
     <div>
       <h4 className='mb-5'>
         U.S. EQUAL EMPLOYMENT OPPORTUNITY INFORMATION &nbsp;&nbsp;
-        <span className='fw-normal' style={{ letterSpacing: 'normal' }}>(Completion is voluntary and will not subject you to adverse treatment)</span>
+        <span 
+          className='fw-normal' 
+          style={{ letterSpacing: 'normal' }}
+        >
+          (Completion is voluntary and will not subject you to adverse treatment)
+        </span>
       </h4>
 
       <p>
