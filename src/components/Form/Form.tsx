@@ -66,35 +66,38 @@ const Form: React.FC = (): JSX.Element => {
     resolver: yupResolver(schema)
   });
 
-  // const uploadOnFirestore = (data: any) => {
-  //   const storageRef = ref(storage, new UUID().getDashFreeUUID())
-  //   const uploadTask = uploadBytesResumable(storageRef, data.resume[0])
+  useEffect(() => {
+    reset()
+  }, [isSubmitSuccessful])
+ 
+  const uploadOnFirestore = (data: any) => {
+    const storageRef = ref(storage, new UUID().getDashFreeUUID())
+    const uploadTask = uploadBytesResumable(storageRef, data.resume[0])
 
-  //   uploadTask.on('state_changed',
-  //     (snapshot) => (snapshot.bytesTransferred / snapshot.totalBytes) * 100,
-  //     (error) => {
-  //       console.log('something went wrong', error)
-  //     }, () => {
-  //       getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-  //         data.resume = downloadURL;
-  //         addDoc(collection(db, 'candidates'), data)
-  //           .catch((e) => {
-  //             alert("error" + e)
-  //             const deleteRef = ref(storage, downloadURL)
-  //             deleteObject(deleteRef)
-  //           })
-  //       });
-  //     }
-  //   )
-  // }
+    uploadTask.on('state_changed',
+      (snapshot) => (snapshot.bytesTransferred / snapshot.totalBytes) * 100,
+      (error) => {
+        console.log('something went wrong', error)
+      }, () => {
+        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+          data.resume = downloadURL;
+          addDoc(collection(db, 'candidates'), data)
+            .catch((e) => {
+              alert("error" + e)
+              const deleteRef = ref(storage, downloadURL)
+              deleteObject(deleteRef)
+            })
+        });
+      }
+    )
+  }
 
   const submitHandler = (data: object) => {
     if (captcha) {
       setCaptcha(false)
       setResumeLabel('ATTACH RESUME/CV')
-      // uploadOnFirestore(data)
-      reset()
-      alert("thank you")
+      uploadOnFirestore(data)
+      alert("Thank you, Your response has been recorded.")
     } else {
       setCaptchaError("Please verify that you are not a robot")
     }
