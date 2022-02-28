@@ -1,8 +1,5 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import firebase from 'firebase/app';
-import 'firebase/firestore';
-import { FirestoreProvider } from 'react-firestore';
 import App from './App';
 
 const config = {
@@ -14,12 +11,9 @@ const config = {
     appId: "1:888087288118:web:2ce2b81500623ab76dbb97"
 }
 
-firebase.initializeApp(config);
 
 ReactDOM.render(
-    <FirestoreProvider firebase={firebase}>
-        <App />
-    </FirestoreProvider>,
+    <App />,
     document.getElementById('root')
 );
 

@@ -1,4 +1,7 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { db, storage } from '../../firebase';
+import { collection, addDoc } from "firebase/firestore";
+import { deleteObject, getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
 import EqualEmployment from '../EqualEmployment/EqualEmployment';
 import Input from '../Input/Input';
 import ReCAPTCHA from "react-google-recaptcha";
@@ -6,19 +9,26 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import './Form.css';
+import { UUID } from 'uuid-generator-ts';
 
 const phoneRegExp = /^(\+[\d]{1,4})[1-9]\d{3,13}$/;
-const linkedinURLRegExp = /^(https?:\/\/(www.)?linkedin.com\/(mwlite\/ | m\/)?in\/[a-zA-Z0-9_.-]+\/?)/;
-const twitterURLRegExp = /^(https?:\/\/(www.)?twitter.com\/[a-zA-Z0-9_.-]+\/?)/;
-const githubURLRegExp = /^(https?:\/\/(www.)?github.com\/[a-zA-Z0-9_.-]+\/?)/;
+const linkedinURLRegExp = /^(https?:\/\/(www.)?linkedin.com\/(mwlite\/ | m\/)?in\/[a-zA-Z0-9_.-]+\/?)*/;
+const twitterURLRegExp = /^(https?:\/\/(www.)?twitter.com\/[a-zA-Z0-9_.-]+\/?)*/;
+const githubURLRegExp = /^(https?:\/\/(www.)?github.com\/[a-zA-Z0-9_.-]+\/?)*/;
+
 
 
 const schema = yup.object().shape({
-  // resume: yup.mixed()
-  //   .required('Please attach your Resume')
-  //   .test('fileSize', 'The file is too large', (vaue) => {
-  //     return value && value[0].size <= 2000000
-  //   }),
+  resume: yup.mixed()
+    .test('required', 'Please upload a file', (value) => {
+      return value && value.length;
+    })
+    .test('fileType', 'File should be a pdf', (value) => {
+      return value && value[0] && ["application/pdf"].includes(value[0].type)
+    })
+    .test('fileSize', 'File should be less than 5MB', (value) => {
+      return value && value[0] && value[0].size <= 5000000
+    }),
   fullName: yup.string()
     .required('Please Fill in this Field')
     .min(10),
@@ -26,10 +36,8 @@ const schema = yup.object().shape({
     .required('Please Fill in this Field')
     .email(),
   phone: yup.string()
-    .required('Please Fill in this Field')
     .matches(phoneRegExp, 'Phone number is not valid').transform(v => v === '' ? void 0 : v),
   linkedinURL: yup.string()
-    .required('Please Fill in this Field')
     .matches(linkedinURLRegExp, 'Enter correct url!'),
   twitterURL: yup.string()
     .matches(twitterURLRegExp, 'Enter correct url!'),
@@ -38,28 +46,77 @@ const schema = yup.object().shape({
 })
 
 const Form: React.FC = (): JSX.Element => {
+
+  const [resumeLabel, setResumeLabel] = useState('ATTACH RESUME/CV');
+  const [captcha, setCaptcha] = useState(false);
+  const [captchaError, setCaptchaError] = useState("");
+
   const {
     register,
     handleSubmit,
-    formState: { errors }
+    formState: { errors, isSubmitSuccessful },
+    reset
   } = useForm({
     resolver: yupResolver(schema)
   });
 
+  useEffect(() => {
+    reset()
+  }, [isSubmitSuccessful])
+
+  const uploadOnFirestore = (data: any) => {
+    const storageRef = ref(storage, new UUID().getDashFreeUUID())
+    const uploadTask = uploadBytesResumable(storageRef, data.resume[0])
+
+    uploadTask.on('state_changed',
+      (snapshot) => (snapshot.bytesTransferred / snapshot.totalBytes) * 100,
+      (error) => {
+        console.log('something went wrong', error)
+      }, () => {
+        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+          data.resume = downloadURL;
+          addDoc(collection(db, 'candidates'), data)
+            .catch((e) => {
+              alert("error" + e)
+              const deleteRef = ref(storage, downloadURL)
+              deleteObject(deleteRef)
+            })
+        });
+      }
+    )
+  }
+
   const submitHandler = (data: object) => {
-    alert(JSON.stringify(data));
+    if (captcha) {
+      setCaptchaError("")
+      setCaptcha(false)
+      setResumeLabel('ATTACH RESUME/CV')
+      uploadOnFirestore(data)
+      alert(JSON.stringify(data));
+    } else {
+      setCaptchaError("Please verify that you are not a robot")
+    }
   }
 
   const selectFile = (e: React.MouseEvent) => {
     const fileInput = document.getElementById('attach-file');
     fileInput?.click();
-    console.log(e.target);
+  }
+
+  const onInputChange = (e: React.FormEvent<HTMLInputElement>) => {
+    if (e.currentTarget.files && e.currentTarget.files[0]) {
+      setResumeLabel(e.currentTarget.files[0].name)
+    }
+  }
+
+  const toggleCaptcha = () => {
+    setCaptcha(true)
   }
 
   return (
     <div className='form-container'>
       <form className='mx-auto' onSubmit={handleSubmit(submitHandler)}>
-        {console.log(errors)}
+
         <h4>SUBMIT YOUR APPLICATION</h4>
 
         <div className="row my-4">
@@ -71,16 +128,18 @@ const Form: React.FC = (): JSX.Element => {
                 id='attach-file'
                 type='file'
                 {...register('resume')}
+                onInput={onInputChange}
               />
               <button
                 className='attach-button'
                 onClick={selectFile}
               >
                 <i className="fa-solid fa-paperclip"></i>
-                ATTACH RESUME/CV
+                {resumeLabel}
               </button>
             </div>
           </div>
+          <p className='error'>{errors.resume?.message}</p>
 
           <Input
             label='Full name'
@@ -102,7 +161,7 @@ const Form: React.FC = (): JSX.Element => {
             label='Phone'
             name='phone'
             register={register}
-            isReq={true}
+            isReq={false}
           />
           <p className='error'>{errors.phone?.message}</p>
 
@@ -122,7 +181,7 @@ const Form: React.FC = (): JSX.Element => {
             label='Linkedin URL'
             name='linkedinURL'
             register={register}
-            isReq={true}
+            isReq={false}
           />
           <p className='error'>{errors.linkedinURL?.message}</p>
 
@@ -171,13 +230,15 @@ const Form: React.FC = (): JSX.Element => {
 
         <hr className='my-5'></hr>
 
-        <EqualEmployment />
+        <EqualEmployment register={register} />
 
         <div className='recaptcha-wrapper'>
           <ReCAPTCHA
             className="my-4"
             sitekey="6LcMq5QeAAAAAMnnojI5eJvtIzoTz_rm5noVnuJm"
+            onChange={toggleCaptcha}
           />
+          <div className='error mb-4 text-center'>{captchaError}</div>
         </div>
 
         <div className='d-flex'>
@@ -185,7 +246,6 @@ const Form: React.FC = (): JSX.Element => {
             type='submit'
             className='submit-button mx-auto text-center'
             value='SUBMIT APPLICATION'
-
           />
         </div>
 

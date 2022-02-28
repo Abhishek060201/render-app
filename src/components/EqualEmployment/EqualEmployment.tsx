@@ -1,8 +1,14 @@
 import React from 'react';
+import { FieldValues, UseFormRegister } from 'react-hook-form';
 import Select from '../Select/Select';
 import './EqualEmployment.css';
 
-const EqualEmployment = () => {
+type Props = {
+  register: UseFormRegister<FieldValues>;
+}
+
+const EqualEmployment = (props: Props) => {
+  
   const toggleRaceInfo = () => {
     const raceInfo = document.querySelector<HTMLElement>('.race-info');
     if (raceInfo) {
@@ -46,6 +52,7 @@ const EqualEmployment = () => {
             option: 'Decline to self-identity'
           }
         ]}
+        register={props.register}
       />
       <Select
         info={
@@ -107,6 +114,7 @@ const EqualEmployment = () => {
             option: 'Decline to self-identity'
           }
         ]}
+        register={props.register}
       />
       <div className='row d-flex justify-content-end'>
         <div className='race-info col-md-9'>
@@ -164,6 +172,7 @@ const EqualEmployment = () => {
             option: 'Decline to self-identity'
           }
         ]}
+        register={props.register}
       />
 
     </div>
