@@ -1,8 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { db, storage } from '../../firebase';
-import { collection, addDoc } from "firebase/firestore";
-import { deleteObject, getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
-import { UUID } from 'uuid-generator-ts';
 import EqualEmployment from '../EqualEmployment/EqualEmployment';
 import Input from '../Input/Input';
 import ReCAPTCHA from "react-google-recaptcha";
@@ -65,34 +61,11 @@ const Form: React.FC = (): JSX.Element => {
   } = useForm({
     resolver: yupResolver(schema)
   });
- 
-  const uploadOnFirestore = (data: any) => {
-    const storageRef = ref(storage, new UUID().getDashFreeUUID())
-    const uploadTask = uploadBytesResumable(storageRef, data.resume[0])
-
-    uploadTask.on('state_changed',
-      (snapshot) => (snapshot.bytesTransferred / snapshot.totalBytes) * 100,
-      (error) => {
-        console.log('something went wrong', error)
-      }, () => {
-        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-          data.resume = downloadURL;
-          addDoc(collection(db, 'candidates'), data)
-            .catch((e) => {
-              alert("error" + e)
-              const deleteRef = ref(storage, downloadURL)
-              deleteObject(deleteRef)
-            })
-        });
-      }
-    )
-  }
 
   const submitHandler = (data: object) => {
     if (captcha) {
       setCaptcha(false)
       setResumeLabel('ATTACH RESUME/CV')
-      uploadOnFirestore(data)
       alert("Thank you, Your response has been recorded.")
       if(isSubmitSuccessful)
         reset()
