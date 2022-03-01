@@ -12,9 +12,9 @@ import * as yup from 'yup';
 import './Form.css';
 
 const phoneRegExp = /^(\+[\d]{1,4})[1-9]\d{3,13}$/;
-const linkedinURLRegExp = /^(|(http(s)?:\/\/)?(www.)?linkedin\.com\/(in)\/[\w]+)$/;
-const twitterURLRegExp = /^(|(http(s)?:\/\/)?(www.)?twitter\.com\/[\w]+)$/;
-const githubURLRegExp = /^(|(http(s)?:\/\/)?(www.)?github\.com\/[\w]+)$/;
+const linkedinURLRegExp = /^(|(http(s)?:\/\/)?(www.)?linkedin\.com\/(in)\/[\w0-9\-_,&=]+)$/;
+const twitterURLRegExp = /^(|(http(s)?:\/\/)?(www.)?twitter\.com\/[\w0-9\-_,&=]+)$/;
+const githubURLRegExp = /^(|(http(s)?:\/\/)?(www.)?github\.com\/[\w0-9\-_,&=]+)$/;
 
 
 
