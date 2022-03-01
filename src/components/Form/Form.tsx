@@ -118,6 +118,7 @@ const Form: React.FC = (): JSX.Element => {
       setCaptchaError("")
       setCaptcha(true)
     } else {
+      setCaptchaError("Please verify that you are not a robot")
       setCaptcha(false)
     }
   }
