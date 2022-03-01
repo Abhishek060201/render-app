@@ -65,10 +65,6 @@ const Form: React.FC = (): JSX.Element => {
   } = useForm({
     resolver: yupResolver(schema)
   });
-
-  useEffect(() => {
-    reset()
-  }, [isSubmitSuccessful])
  
   const uploadOnFirestore = (data: any) => {
     const storageRef = ref(storage, new UUID().getDashFreeUUID())
@@ -98,6 +94,8 @@ const Form: React.FC = (): JSX.Element => {
       setResumeLabel('ATTACH RESUME/CV')
       uploadOnFirestore(data)
       alert("Thank you, Your response has been recorded.")
+      if(isSubmitSuccessful)
+        reset()
     } else {
       setCaptchaError("Please verify that you are not a robot")
     }
