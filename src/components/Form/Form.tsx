@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import EqualEmployment from '../EqualEmployment/EqualEmployment';
 import Input from '../Input/Input';
 import ReCAPTCHA from "react-google-recaptcha";
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
+import axios from 'axios';
 import './Form.css';
 
 const phoneRegExp = /^(\+[\d]{1,4})[1-9]\d{3,13}$/;
@@ -41,7 +42,7 @@ const schema = yup.object().shape({
     .matches(githubURLRegExp, 'Enter correct url!'),
   additionalInfo: yup.string()
     .test('isEmptyOrMin30Chars', 'Should be atleast 30 characters long', (value: string | undefined) => {
-      if(!value || value.length >= 30) 
+      if (!value || value.length >= 30)
         return true
       return false
     })
@@ -62,11 +63,33 @@ const Form: React.FC = (): JSX.Element => {
     resolver: yupResolver(schema)
   });
 
-  const submitHandler = (data: object) => {
+  const submitHandler = async (data: {[k: string]: any}) => {
     if (captcha) {
       setCaptcha(false)
       setResumeLabel('ATTACH RESUME/CV')
       alert("Thank you, Your response has been recorded.")
+
+      // console.log('data', data)
+
+      // upload resume to strapi
+      let resumeData = new FormData()
+      resumeData.append('files', data.resume[0])
+
+      const uploadFile = await axios({
+        method: 'POST',
+        url: 'http://localhost:1337/api/upload',
+        data: resumeData
+      })
+
+      data.resume = uploadFile.data[0]
+
+      //upload json data to strapi
+      await axios.post('http://localhost:1337/api/render-forms', { data })
+      .then(response => {
+        console.log(response)
+      })
+
+      //Reset the fields
       if(isSubmitSuccessful)
         reset()
     } else {
@@ -87,7 +110,7 @@ const Form: React.FC = (): JSX.Element => {
   }
 
   const toggleCaptcha = (value: any) => {
-    if(value !== null) {
+    if (value !== null) {
       setCaptchaError("")
       setCaptcha(true)
     } else {
@@ -157,7 +180,7 @@ const Form: React.FC = (): JSX.Element => {
           <p className='error'>{errors.company?.message}</p>
 
         </div>
-        
+
         {console.log(errors)}
 
         <h4>LINKS</h4>
@@ -200,19 +223,20 @@ const Form: React.FC = (): JSX.Element => {
           />
         </div>
 
-        {/* {console.log(register)} */}
-
         <h4 className='my-5'>PREFERRED PRONOUNS</h4>
         <div className="row">
           <label className='mb-4'>If you'd like, please share your pronouns with us.</label>
           <div className='mb-5'>
-            <input placeholder='Type your response' />
+            <input 
+              placeholder='Type your response' 
+              {...register('preferredPronoun')}
+            />
           </div>
         </div>
 
         <h4 className='my-5'>ADDITIONAL INFORMATION</h4>
-        <textarea 
-          placeholder='Add a cover letter or anything else you want to share.' 
+        <textarea
+          placeholder='Add a cover letter or anything else you want to share.'
           {...register('additionalInfo')}
         />
         <p className='error'>{errors.additionalInfo?.message}</p>

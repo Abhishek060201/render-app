@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { FieldValues, UseFormRegister } from 'react-hook-form';
+import { FieldValues, UseFormRegister } from 'react-hook-form'; 
+import * as _ from 'lodash';
 import './Select.css';
 
 type optionObject = {
@@ -28,7 +29,7 @@ const Select = (props: Props) => {
         }
       </label>
       <div className='col-md-9 my-4 my-md-3'>
-        <select {...props.register(props.label)}>
+        <select {...props.register(_.camelCase(props.label))}>
           {
             props.options.map((each) => {
               return (
