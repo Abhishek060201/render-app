@@ -88,11 +88,11 @@ const Form: React.FC = (): JSX.Element => {
     )
   }
 
-  const submitHandler = (data: object) => {
+  const submitHandler = async (data: object) => {
     if (captcha) {
       setCaptcha(false)
       setResumeLabel('ATTACH RESUME/CV')
-      uploadOnFirestore(data)
+      await uploadOnFirestore(data)
       alert("Thank you, Your response has been recorded.")
       if(isSubmitSuccessful)
         reset()
