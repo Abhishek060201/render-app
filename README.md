@@ -1,4 +1,4 @@
-Prop Strucyure
+Prop Structure
 
 Form Component
 
